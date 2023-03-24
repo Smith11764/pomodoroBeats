@@ -2,7 +2,10 @@
 
 namespace App\Providers;
 
+use Faker\Factory;
 use Illuminate\Support\ServiceProvider;
+use Faker\Provider\ja_JP\Person;
+use Faker\Generator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -23,6 +26,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        $faker = Factory::create('ja_JP');
+        $faker->addProvider(new Person($faker));
+
+        $this->app->singleton(Generator::class, function () use ($faker) {
+            return $faker;
+        });
     }
 }
