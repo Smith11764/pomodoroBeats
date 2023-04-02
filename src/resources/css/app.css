@@ -1,3 +1,24 @@
+/*@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');*/
+@font-face {
+    font-family: 'NuMochi';
+    /*src: url('/fonts/NuKinakoMochi-Reg-Rnd1.otf') format('opentype');*/
+    src: url('/fonts/NuAnkoMochi-Square-1.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import '~nes.css/css/nes.min.css';
+
+html, body {
+    font-family: 'NuMochi', sans-serif;
+}
+h1{
+    font-size: 3rem; /* 任意のサイズに変更してください */
+    font-weight: 700; /* 任意のウェイトに変更してください */
+}
+h2{
+    font-size: 2rem; /* 任意のサイズに変更してください */
+    font-weight: 500; /* 任意のウェイトに変更してください */
+}

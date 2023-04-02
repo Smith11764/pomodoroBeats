@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PomodoroController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,12 +14,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [PomodoroController::class, 'index'])
+->middleware(['auth'])->name('pomodoro');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth'])->name('dashboard');
 
-require __DIR__.'/auth.php';
+Route::get('register', [RegisteredUserController::class, 'create'])
+    ->name('register');
+require __DIR__ . '/auth.php';
