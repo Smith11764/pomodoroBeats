@@ -1,6 +1,15 @@
 body{
     background-color: black;
 }
+.auth-buttons-container {
+    display: flex;
+    justify-content: flex-end;
+    padding: 1rem;
+}
+
+.auth-buttons-container .nes-btn {
+    margin-left: 1rem;
+}
 .nes-container{
 }
 .rapper_image{
@@ -67,7 +76,7 @@ body{
 }
 .nes-container.is-dark.music-container.with-title {
     display: flex;
-    flex-direction: column; /* 追加：リストを縦並びにする */
+    flex-direction: column;
 }
 .input-container {
     display: flex;
@@ -83,14 +92,32 @@ body{
 .task-label{
     margin: 0;
 }
-.move-button, .delete-button {
+.move-button {
     width: 1em;
     height: 1em;
-    margin-right: 10px; /* 値を変更 */
+    margin-right: 10px;
     cursor: pointer;
+}
+.delete-button {
+    width: 1em;
+    height: 1em;
+    cursor: pointer;
+}
+.task_review_section {
+    width: 50%;
 }
 .task-container {
     display: flex;
     align-items: center;
-    justify-content: flex-start; /* 追加 */
+    justify-content: space-between;
+    width: 100%;
+}
+.task-container>label {
+    flex-basis: 80%;
+}
+.task-container:first-child,
+.task-container:nth-child(2),
+.task-container:last-child
+{
+    flex-basis: auto;
 }

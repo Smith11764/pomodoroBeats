@@ -14,9 +14,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', [PomodoroController::class, 'index'])
-->middleware(['auth'])->name('pomodoro');
-
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth'])->name('dashboard');
@@ -24,3 +21,7 @@ Route::get('/dashboard', function () {
 Route::get('register', [RegisteredUserController::class, 'create'])
     ->name('register');
 require __DIR__ . '/auth.php';
+
+Route::middleware('auth')->group(function () {
+    Route::get('/', [PomodoroController::class, 'index'])->name('pomodoro');
+});
