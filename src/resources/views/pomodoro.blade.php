@@ -107,44 +107,13 @@
             <div class="task_review_section">
                 <div class="nes-container is-dark music-container with-title" id="todo_task">
                     <p class="title">ToDo</p>
-{{--                    @foreach ($tasks as $task)--}}
-{{--                        <div class="task-container">--}}
-{{--                            @if (!$task->is_done)--}}
-{{--                                <img src="{{ asset('images/up_arrow.png') }}" class="move-button">--}}
-{{--                                <img src="{{ asset('images/down_arrow.png') }}" class="move-button">--}}
-{{--                                <label class="task-label" data-task-id="{{ $task->id }}" data-is-done="{{ $task->is_done }}">--}}
-{{--                                    <input type="checkbox" class="nes-checkbox is-dark">--}}
-{{--                                    <span>{{$task->task}}</span>--}}
-{{--                                </label>--}}
-{{--                                <img src="{{ asset('images/batsu.png') }}" class="delete-button">--}}
-{{--                            @endif--}}
-{{--                        </div>--}}
-{{--                    @endforeach--}}
                 </div>
             </div>
             <div class="task_review_section">
                 <div class="nes-container is-dark music-container with-title" id="done_task">
                     <p class="title">Done</p>
-{{--                    @foreach ($tasks as $task)--}}
-{{--                        <div class="task-container">--}}
-{{--                            @if ($task->is_done)--}}
-{{--                                <img src="{{ asset('images/up_arrow.png') }}" class="move-button">--}}
-{{--                                <img src="{{ asset('images/down_arrow.png') }}" class="move-button">--}}
-{{--                                <label class="task-label" data-task-id="{{ $task->id }}" data-is-done="{{ $task->is_done }}">--}}
-{{--                                    <input type="checkbox" class="nes-checkbox is-dark">--}}
-{{--                                    <span>{{$task->task}}</span>--}}
-{{--                                </label>--}}
-{{--                                <img src="{{ asset('images/batsu.png') }}" class="delete-button">--}}
-{{--                            @endif--}}
-{{--                        </div>--}}
-{{--                    @endforeach--}}
                 </div>
             </div>
-            {{--        <div class="task_review_section">--}}
-            {{--            <div class="nes-container is-dark music-container with-title" id="achive_task">--}}
-            {{--                <p class="title">Archive</p>--}}
-            {{--            </div>--}}
-            {{--        </div>--}}
         </div>
     </div>
 </body>
