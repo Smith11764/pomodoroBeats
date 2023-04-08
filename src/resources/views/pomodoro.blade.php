@@ -11,7 +11,8 @@
     <link href="{{ asset('css/pomodoro.css') }}" rel="stylesheet">
 
     <!-- Scripts -->
-    <script src="{{ asset('js/pomodoro.js') }}"></script>
+    <script src="{{ asset('js/timer.js') }}"></script>
+    <script src="{{ asset('js/todo.js') }}"></script>
 </head>
 <body>
     <!-- Auth Buttons Container -->
