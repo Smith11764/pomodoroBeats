@@ -68,7 +68,7 @@ body{
 
 /*todo_section*/
 .task_review_container {
-     display: flex;
+    display: flex;
 }
 .task_review_section {
     flex-grow: 1;
