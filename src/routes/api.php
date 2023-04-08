@@ -21,4 +21,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/tasks/user', [TaskApiController::class, 'getAuthenticatedUserTasks']);
+    Route::post('/tasks', [TaskApiController::class, 'store']);
+    Route::put('/tasks/{task}', [TaskApiController::class, 'update']);
+    Route::delete('/tasks/{task}', [TaskApiController::class, 'destroy']);
 });

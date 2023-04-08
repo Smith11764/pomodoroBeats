@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         try {
             const tasks = await getTasksFromServer();
             tasks.forEach(task => {
-                const taskElement = createTaskElement(task.task);
+                const taskElement = createTaskElement(task.task, task.id, task.is_done);
                 if (task.is_done) {
                     doneTask.appendChild(taskElement);
                 } else {
@@ -115,16 +115,37 @@ document.addEventListener("DOMContentLoaded", async function () {
         const deleteImageSrc = appElement.getAttribute("data-delete-image");
         deleteButton.src = deleteImageSrc;
         deleteButton.className = "delete-button";
-        deleteButton.addEventListener("click", function () {
+        deleteButton.addEventListener("click", async function () {
             taskContainer.remove(); // taskContainerを削除
+
+            // タスク削除APIを呼び出す
+            try {
+                const taskId = taskContainer.getAttribute('data-task-id');
+                const response = await fetch(`/api/tasks/${taskId}`, {
+                    method: 'DELETE',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error deleting task');
+                }
+            } catch (error) {
+                console.error('Error deleting task:', error);
+                alert('Error deleting task. Please try again.');
+            }
         });
         return deleteButton;
     }
 
-    function createTaskElement(taskText) {
+    function createTaskElement(taskText, taskId, isDone = false) {
         const taskContainer = document.createElement("div");
         taskContainer.className = "task-container";
-        // taskContainer.setAttribute("data-task-id", taskId);
+        taskContainer.setAttribute("data-task-id", taskId);
 
         const newTaskLabel = document.createElement("label");
         newTaskLabel.className = "task-label";
@@ -132,13 +153,40 @@ document.addEventListener("DOMContentLoaded", async function () {
         newTaskCheckbox.type = "checkbox";
         newTaskCheckbox.className = "nes-checkbox is-dark";
 
+        if (isDone) {
+            newTaskCheckbox.checked = true;
+        }
 
         // チェックボックスがチェックされたとき
-        newTaskCheckbox.addEventListener("change", function () {
-            if (this.checked) {
+        newTaskCheckbox.addEventListener("change", async function () {
+            const isChecked = this.checked;
+            if (isChecked) {
                 doneTask.appendChild(taskContainer);
             } else {
                 todoTask.appendChild(taskContainer);
+            }
+            // タスク更新APIを呼び出す
+            try {
+                const taskId = taskContainer.getAttribute('data-task-id');
+                const response = await fetch(`/api/tasks/${taskId}`, {
+                    method: 'PUT',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    },
+                    body: JSON.stringify({
+                        is_done: isChecked,
+                    }),
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error updating task');
+                }
+            } catch (error) {
+                console.error('Error updating task:', error);
+                alert('Error updating task. Please try again.');
             }
         });
 
@@ -159,7 +207,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         return taskContainer;
     }
 
-    addTaskButton.addEventListener("click", function () {
+    addTaskButton.addEventListener("click", async function () {
         const taskText = textareaField.value.trim();
         if (taskText === "") {
             alert("Please enter a task.");
@@ -170,6 +218,32 @@ document.addEventListener("DOMContentLoaded", async function () {
         todoTask.appendChild(taskElement);
 
         textareaField.value = "";
+        // タスク追加APIを呼び出す
+        try {
+            const response = await fetch('/api/tasks', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                },
+                body: JSON.stringify({
+                    task: taskText,
+                    is_done: false,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Error adding task');
+            }
+
+            const taskData = await response.json();
+            taskElement.setAttribute('data-task-id', taskData.id);
+        } catch (error) {
+            console.error('Error adding task:', error);
+            alert('Error adding task. Please try again.');
+        }
     });
 
     // 初期表示のタスクをレンダリング
