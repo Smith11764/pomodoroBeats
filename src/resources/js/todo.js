@@ -20,8 +20,12 @@ document.addEventListener("DOMContentLoaded", async function () {
     async function renderInitialTasks() {
         try {
             const tasks = await getTasksFromServer();
+
+            // タスクをorder順にソート
+            tasks.sort((a, b) => a.order - b.order);
+
             tasks.forEach(task => {
-                const taskElement = createTaskElement(task.task, task.id, task.is_done);
+                const taskElement = createTaskElement(task.task, task.id, task.is_done, task.order);
                 if (task.is_done) {
                     doneTask.appendChild(taskElement);
                 } else {
@@ -31,6 +35,33 @@ document.addEventListener("DOMContentLoaded", async function () {
         } catch (error) {
             console.error("Error fetching tasks:", error);
             alert("Error fetching tasks from server. Please try again.");
+        }
+    }
+
+    async function updateTaskOrder(taskContainer, siblingTaskContainer) {
+        const taskId = taskContainer.getAttribute('data-task-id');
+        const siblingTaskId = siblingTaskContainer.getAttribute('data-task-id');
+
+        try {
+            const response = await fetch(`/api/tasks/${taskId}/update_order`, {
+                method: 'PUT',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                },
+                body: JSON.stringify({
+                    sibling_task_id: siblingTaskId,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Error updating task order');
+            }
+        } catch (error) {
+            console.error('Error updating task order:', error);
+            alert('Error updating task order. Please try again.');
         }
     }
 
@@ -45,69 +76,28 @@ document.addEventListener("DOMContentLoaded", async function () {
         moveUpButton.className = "move-button";
         moveDownButton.className = "move-button";
 
-        moveUpButton.addEventListener("click", function () {
+        moveUpButton.addEventListener("click", async function () {
             const previousSibling = taskContainer.previousElementSibling;
             if (previousSibling && previousSibling.className !== "title") {
                 taskContainer.parentElement.insertBefore(taskContainer, previousSibling);
+
+                // タスク順序を更新
+                await updateTaskOrder(taskContainer, previousSibling);
             }
         });
 
-        moveDownButton.addEventListener("click", function () {
+        moveDownButton.addEventListener("click", async function () {
             const nextSibling = taskContainer.nextElementSibling;
             if (nextSibling) {
                 taskContainer.parentElement.insertBefore(nextSibling, taskContainer);
+
+                // タスク順序を更新
+                await updateTaskOrder(taskContainer, nextSibling);
             }
         });
 
         return { moveUpButton, moveDownButton };
     }
-
-    function initializeTaskListeners() {
-        const taskContainers = document.querySelectorAll('.task-container');
-        taskContainers.forEach(taskContainer => {
-            const moveButtons = taskContainer.querySelectorAll('.move-button');
-
-            // todo:↓の判定がないと、moveButtonsが存在しない場合にエラーが発生する
-            // なぜ、存在しない場合が存在するかは不明なので後で調査(必要なタスクは表示されるので機能には問題ないと判断)
-            // console.log(moveButtons);
-            if (moveButtons.length > 0) {
-                const moveUpButton = moveButtons[0];
-                const moveDownButton = moveButtons[1];
-                const deleteButton = taskContainer.querySelector('.delete-button');
-                const taskCheckbox = taskContainer.querySelector('input[type="checkbox"].nes-checkbox');
-
-                moveUpButton.addEventListener('click', function() {
-                    const previousSibling = taskContainer.previousElementSibling;
-                    if (previousSibling && previousSibling.className !== 'title') {
-                        taskContainer.parentElement.insertBefore(taskContainer, previousSibling);
-                    }
-                });
-
-                moveDownButton.addEventListener('click', function() {
-                    const nextSibling = taskContainer.nextElementSibling;
-                    if (nextSibling) {
-                        taskContainer.parentElement.insertBefore(nextSibling, taskContainer);
-                    }
-                });
-
-                deleteButton.addEventListener('click', function() {
-                    taskContainer.remove();
-                });
-
-                taskCheckbox.addEventListener('change', function() {
-                    if (this.checked) {
-                        doneTask.appendChild(taskContainer);
-                    } else {
-                        todoTask.appendChild(taskContainer);
-                    }
-                });
-            }else{
-                console.error('Move buttons not found');
-                return;
-            }
-        });
-    }
-
 
     function createDeleteButton(taskContainer) {
         const deleteButton = document.createElement("img");
@@ -142,10 +132,11 @@ document.addEventListener("DOMContentLoaded", async function () {
         return deleteButton;
     }
 
-    function createTaskElement(taskText, taskId, isDone = false) {
+    function createTaskElement(taskText, taskId, isDone = false, order = 0) {
         const taskContainer = document.createElement("div");
         taskContainer.className = "task-container";
         taskContainer.setAttribute("data-task-id", taskId);
+        taskContainer.setAttribute("data-order", order);
 
         const newTaskLabel = document.createElement("label");
         newTaskLabel.className = "task-label";
@@ -168,7 +159,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             // タスク更新APIを呼び出す
             try {
                 const taskId = taskContainer.getAttribute('data-task-id');
-                const response = await fetch(`/api/tasks/${taskId}`, {
+                const response = await fetch(`/api/tasks/${taskId}/update_check`, {
                     method: 'PUT',
                     credentials: 'same-origin',
                     headers: {
@@ -182,11 +173,11 @@ document.addEventListener("DOMContentLoaded", async function () {
                 });
 
                 if (!response.ok) {
-                    throw new Error('Error updating task');
+                    throw new Error('Error updating task is done');
                 }
             } catch (error) {
-                console.error('Error updating task:', error);
-                alert('Error updating task. Please try again.');
+                console.error('Error updating task is done:', error);
+                alert('Error updating task is done. Please try again.');
             }
         });
 
@@ -214,9 +205,6 @@ document.addEventListener("DOMContentLoaded", async function () {
             return;
         }
 
-        const taskElement = createTaskElement(taskText);
-        todoTask.appendChild(taskElement);
-
         textareaField.value = "";
         // タスク追加APIを呼び出す
         try {
@@ -239,6 +227,11 @@ document.addEventListener("DOMContentLoaded", async function () {
             }
 
             const taskData = await response.json();
+
+            // createTaskElement関数でtaskData.idを使用して属性を設定する
+            const taskElement = createTaskElement(taskText, taskData.id, false);
+            todoTask.appendChild(taskElement);
+
             taskElement.setAttribute('data-task-id', taskData.id);
         } catch (error) {
             console.error('Error adding task:', error);

@@ -22,6 +22,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/tasks/user', [TaskApiController::class, 'getAuthenticatedUserTasks']);
     Route::post('/tasks', [TaskApiController::class, 'store']);
-    Route::put('/tasks/{task}', [TaskApiController::class, 'update']);
+    Route::put('/tasks/{task}/update_check', [TaskApiController::class, 'updateCheck']);
+    Route::put('/tasks/{task}/update_order', [TaskApiController::class, 'updateOrder']);
     Route::delete('/tasks/{task}', [TaskApiController::class, 'destroy']);
 });

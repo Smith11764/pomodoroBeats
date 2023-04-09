@@ -37,7 +37,7 @@ class TaskApiController extends Controller
         return response()->json($task);
     }
 
-    public function update(Request $request, Task $task)
+    public function updateCheck(Request $request, Task $task)
     {
         if ($task->user_id !== $request->user()->id) {
             return response()->json(['error' => 'Unauthorized'], 403);
@@ -56,6 +56,24 @@ class TaskApiController extends Controller
 
         return response()->json($task);
     }
+
+    public function updateOrder(Request $request, Task $task)
+    {
+        $siblingTaskId = $request->input('sibling_task_id');
+        $siblingTask = Task::findOrFail($siblingTaskId);
+
+        // タスクのorderをスワップ
+        $tempOrder = $task->order;
+        $task->order = $siblingTask->order;
+        $siblingTask->order = $tempOrder;
+
+        // タスクのorderをデータベースに保存
+        $task->save();
+        $siblingTask->save();
+
+        return response()->json(['message' => 'Task order updated successfully.']);
+    }
+
 
     public function destroy(Request $request, Task $task)
     {
