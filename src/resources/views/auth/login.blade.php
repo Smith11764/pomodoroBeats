@@ -45,7 +45,7 @@
                 </label>
             </div>
 
-            <div">
+            <div>
                 @if (Route::has('password.request'))
                     <a href="{{ route('password.request') }}">
                         {{ __('Forgot your password?') }}
@@ -55,6 +55,11 @@
                 <x-button class="nes-btn is-primary">
                     {{ __('Log in') }}
                 </x-button>
+            </div>
+            <div>
+                <a href="{{ route('register') }}">
+                    {{ __('not registerd?') }}
+                </a>
             </div>
         </form>
     </x-auth-card>
