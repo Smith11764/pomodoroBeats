@@ -25,6 +25,7 @@ body{
 /* end sidebar */
 /* main-content */
 .main-content {
+    margin-top: 2%;
     margin-left: 150px; /* サイドバーの幅に合わせる */
     padding: 1rem;
 }
